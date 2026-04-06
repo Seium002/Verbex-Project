@@ -77,48 +77,77 @@ x-api-key: YOUR_KEY
 
 ## 🏗️ Architecture
 
-[Browser] → [Next.js Frontend :3000]
-                │
-     ┌──────────┼──────────┐
-     ↓          ↓          ↓
-[auth :8081] [agent :8082] [chat :8083]
-     │          │          │
-     └──────────┴──────────┘
-                │
-        [PostgreSQL (NeonDB)]
-                │
-        [OpenRouter LLM API]
+```
+                ┌───────────────────────────┐
+                │        Browser (User)     │
+                └────────────┬──────────────┘
+                             │
+                             ▼
+                ┌───────────────────────────┐
+                │   Next.js Frontend (3000) │
+                └────────────┬──────────────┘
+                             │
+        ┌───────────────┬────┴─────┬───────────────┐
+        ▼               ▼          ▼               ▼
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│ Auth Service │ │ Agent Service│ │ Chat Service │
+│   (8081)     │ │   (8082)     │ │   (8083)     │
+└──────┬───────┘ └──────┬───────┘ └──────┬───────┘
+       │                │                │
+       └──────────┬─────┴─────┬──────────┘
+                  ▼           ▼
+        ┌───────────────────────────┐
+        │   PostgreSQL (NeonDB)     │
+        └────────────┬──────────────┘
+                     ▼
+        ┌───────────────────────────┐
+        │   OpenRouter LLM API      │
+        └───────────────────────────┘
+```
 
----
+### 🔁 Flow Overview
+
+1. User interacts with **Next.js frontend**
+2. Frontend calls backend services:
+   - Auth Service → login/signup
+   - Agent Service → manage agents
+   - Chat Service → handle chat
+3. Chat Service:
+   - Fetches agent config
+   - Calls OpenRouter API
+   - Stores messages in database
+4. All services use **PostgreSQL (NeonDB)**
+
 
 ## 📂 Project Structure
 
-/
+```
+.
 ├── services/
-│   ├── auth-service/
-│   ├── agent-service/
-│   └── chat-service/
-├── frontend/
-├── docker-compose.yml
-├── .env.example
-├── AGENT_BUILD_PLAN.md
-└── README.md
+│   ├── auth-service/        # Authentication (JWT, signup, login)
+│   ├── agent-service/       # Agent CRUD, API keys, analytics
+│   └── chat-service/        # Chat, conversations, LLM, webhooks
+│
+├── frontend/                # Next.js app (dashboard + chat UI)
+│
+├── docker-compose.yml       # Runs all services
+├── .env.example             # Environment variables template
+├── AGENT_BUILD_PLAN.md      # AI build instructions
+└── README.md                # Project documentation
+```
 
----
+### 🧩 Structure Explanation
+
+- **services/** → Contains all backend microservices  
+- **auth-service/** → Handles authentication and JWT  
+- **agent-service/** → Manages chatbot agents  
+- **chat-service/** → Handles chat logic and AI integration  
+- **frontend/** → User interface (dashboard + public chat)  
+- **docker-compose.yml** → Runs everything together  
+- **.env.example** → Required environment variables  
+
 
 ## ⚙️ Setup Instructions
-
-### 🔹 Docker (Recommended)
-
-git clone <your-repo-url>  
-cd Verbex-Project  
-cp .env.example .env  
-
-Update `.env`:
-
-DATABASE_URL=your_database_url  
-JWT_SECRET=your_secret  
-OPENROUTER_API_KEY=your_key  
 
 Run:
 
