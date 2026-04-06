@@ -1,0 +1,19 @@
+{
+  "name": "verbex-ai-agent",
+  "private": true,
+  "workspaces": [
+    "services/*",
+    "frontend"
+  ],
+  "scripts": {
+    "build": "npm --workspace services/auth-service run build && npm --workspace services/agent-service run build && npm --workspace services/chat-service run build && npm --workspace frontend run build",
+    "install:all": "npm install",
+    "dev": "echo Use workspace commands like npm --workspace frontend run dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  },
+  "overrides": {
+    "node-fetch": "3.3.2"
+  }
+}
